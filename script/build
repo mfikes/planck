@@ -55,7 +55,7 @@ export GCC_RELEASE="20190301"
 export CLOSURE_JS_RELEASE=${GCC_RELEASE}.0.0
 script/get-closure-compiler
 
-export GCL_RELEASE="20190301"
+export GCL_RELEASE="0.0-20191016-6ae1f72f"
 script/get-closure-library
 
 script/get-build-cache
