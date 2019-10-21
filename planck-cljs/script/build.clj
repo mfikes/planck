@@ -33,8 +33,6 @@
      :optimize-constants false
      :dump-core          false
      :parallel-build     true
-     :libs               ["lib/closure"
-                          "lib/third_party/closure"]
      :foreign-libs       [{:file     "jscomp.js"
                            :provides ["google-closure-compiler-js"]}
                           {:file     "paredit.js"
