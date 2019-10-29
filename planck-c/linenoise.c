@@ -1446,3 +1446,17 @@ void sigwinchHandler( int sig_number ) {
 void linenoiseSetupSigWinchHandler() {
     signal(SIGWINCH, sigwinchHandler);
 }
+
+char linenoiseGetKeyPress() {
+    if (enableRawMode(STDIN_FILENO) == -1) {
+        fprintf(stderr, "failed to enable raw mode");
+        return 0;
+    }
+    char c;
+    ssize_t nread = read(STDIN_FILENO, &c, 1);
+    if (nread == -1) {
+        c = 0;
+    }
+    disableRawMode(STDIN_FILENO);
+    return c;
+}

@@ -283,6 +283,9 @@
   :args (s/cat :prompt (s/? string?))
   :ret string?)
 
+(defn get-keypress []
+  (js/PLANCK_GET_KEYPRESS))
+
 (defonce
   ^{:dynamic true
     :private true}

@@ -29,6 +29,7 @@
 #include "clock.h"
 #include "sockets.h"
 #include "tasks.h"
+#include "linenoise.h"
 
 JSValueRef make_error_with_errno(JSContextRef ctx) {
     JSValueRef arguments[1];
@@ -1614,4 +1615,10 @@ JSValueRef function_isatty(JSContextRef ctx, JSObjectRef function, JSObjectRef t
     }
   }
   return JSValueMakeNull(ctx);
+}
+
+JSValueRef function_get_keypress(JSContextRef ctx, JSObjectRef function, JSObjectRef thisObject,
+                                 size_t argc, const JSValueRef args[], JSValueRef *exception) {
+    char c = linenoiseGetKeyPress();
+    return JSValueMakeNumber(ctx, c);
 }
