@@ -1,9 +1,31 @@
 kind: pipeline
-name: default
+name: arm
 
 platform:
   os: linux
   arch: arm
+
+steps:
+- name: build
+  image: golang
+  commands:
+  - uname -a
+  - curl -O https://download.clojure.org/install/linux-install-1.9.0.315.sh
+  - chmod +x linux-install-1.9.0.315.sh
+  - ./linux-install-1.9.0.315.sh
+  - apt-get update
+  - apt-get -qq install -y default-jdk clang cmake xxd pkg-config unzip
+  - apt-get -qq install -y libjavascriptcoregtk-4.0 libglib2.0-dev libzip-dev libcurl4-gnutls-dev libicu-dev
+  - script/build --fast -Werror
+  - script/test
+
+---
+kind: pipeline
+name: arm64
+
+platform:
+  os: linux
+  arch: arm64
 
 steps:
 - name: build

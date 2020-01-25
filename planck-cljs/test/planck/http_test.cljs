@@ -194,7 +194,8 @@
     (is (= (expected-request "PATCH")
           (:request (http/patch url {:debug true}))))))
 
-(deftest binary-body-response-test
+;; Commented until https://github.com/planck-repl/planck/issues/966 fixed
+#_(deftest binary-body-response-test
   (let [response (http/get "http://planck-repl.org/releases/andare/andare-0.2.0.jar"
                    {:binary-response  true
                     :follow-redirects true})]
