@@ -17,4 +17,4 @@ steps:
   - apt-get -qq install -y default-jdk clang cmake xxd pkg-config unzip
   - apt-get -qq install -y libjavascriptcoregtk-4.0 libglib2.0-dev libzip-dev libcurl4-gnutls-dev libicu-dev
   - script/build --fast -Werror
-  - script/test
+  - script/test-int
