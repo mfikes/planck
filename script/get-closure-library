@@ -11,15 +11,18 @@ if [ ! -f $output ]; then
   echo "Fetching Google Closure Library..."
 
   if ! [ -d planck-cljs/lib/closure ]; then
-    mkdir -p planck-cljs/lib
-    cd planck-cljs/lib
-    curl --retry 3 -LO -s https://github.com/google/closure-library/archive/v$GCL_RELEASE.zip || { echo "Download failed."; exit 1; }
-    unzip -qu v$GCL_RELEASE.zip
-    mv closure-library-$GCL_RELEASE/closure .
-    mv closure-library-$GCL_RELEASE/third_party .
-    echo "Cleaning up Google Closure Library archive..."
-    rm -rf closure-library-$GCL_RELEASE
-    rm v$GCL_RELEASE.zip
+    mkdir -p planck-cljs/lib/closure
+    cd planck-cljs/lib/closure
+    curl --retry 3 -LO -s https://repo1.maven.org/maven2/org/clojure/google-closure-library/$GCL_RELEASE/google-closure-library-$GCL_RELEASE.jar || { echo "Download failed."; exit 1; }
+    jar xf google-closure-library-$GCL_RELEASE.jar
+    rm google-closure-library-$GCL_RELEASE.jar
+    cd ..
+    mkdir -p third_party/closure
+    cd third_party/closure
+    curl --retry 3 -O -s https://repo1.maven.org/maven2/org/clojure/google-closure-library-third-party/$GCL_RELEASE/google-closure-library-third-party-$GCL_RELEASE.jar || { echo "Download failed."; exit 1; }
+    jar xf google-closure-library-third-party-$GCL_RELEASE.jar
+    rm google-closure-library-third-party-$GCL_RELEASE.jar
+    cd ../..
     cd ../..
   fi
 
@@ -39,6 +42,8 @@ EOF
                 -or -path './fx' -prune \
                 -or -path './graphics' -prune \
                 -or -path './labs' -prune \
+                -or -path './messaging/testdata' -prune \
+                -or -path './module/testdata' -prune \
                 -or -path './net/testdata' -prune \
                 -or -path './testing' -prune \
                 -or -path './ui' -prune \

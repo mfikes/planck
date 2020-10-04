@@ -275,31 +275,39 @@ void bootstrap(char *out_path) {
     evaluate_script(ctx, deps_script_str, "<bootstrap:deps>");
     free(deps_script_str);
 
-    evaluate_script(ctx, "goog.isProvided_ = function(x) { return false; };", source);
-
-    evaluate_script(ctx,
-                    "goog.require = function (name) {\n"
-                    "  return CLOSURE_IMPORT_SCRIPT(goog.debugLoader_ ? \n"
-                    "                                goog.debugLoader_.getPathFromDeps_(name) :\n"
-                    "                                goog.dependencies_.nameToPath[name]); };",
-                    source);
-
     evaluate_script(ctx, "goog.require('cljs.core');", source);
+
+    evaluate_script(ctx, "goog.isProvided_ = function(x) { return false; };", source);
 
     // redef goog.require to track loaded libs
     evaluate_script(ctx,
-                    "cljs.core._STAR_loaded_libs_STAR_ = cljs.core.into.call(null, cljs.core.PersistentHashSet.EMPTY, [\"cljs.core\"]);\n"
-                            "goog.require = function (name, reload) {\n"
-                            "    if(!cljs.core.contains_QMARK_(cljs.core._STAR_loaded_libs_STAR_, name) || reload) {\n"
-                            "        var AMBLY_TMP = cljs.core.PersistentHashSet.EMPTY;\n"
-                            "        if (cljs.core._STAR_loaded_libs_STAR_) {\n"
-                            "            AMBLY_TMP = cljs.core._STAR_loaded_libs_STAR_;\n"
-                            "        }\n"
-                            "        cljs.core._STAR_loaded_libs_STAR_ = cljs.core.into.call(null, AMBLY_TMP, [name]);\n"
-                            "        CLOSURE_IMPORT_SCRIPT(goog.debugLoader_ ? \n"
-                            "                               goog.debugLoader_.getPathFromDeps_(name) :\n"
-                            "                               goog.dependencies_.nameToPath[name]);\n"
-                            "    }\n"
+                    "goog.require__ = goog.require;\n"
+                    "goog.require = (src, reload) => {\n"
+                    "if(reload === \"reload-all\") {\n"
+                    "goog.cljsReloadAll_ = true\n"
+                    "}\n"
+                    "if(reload || goog.cljsReloadAll_) {\n"
+                    "if(goog.debugLoader_) {\n"
+                    "let path = goog.debugLoader_.getPathFromDeps_(src);\n"
+                    "goog.object.remove(goog.debugLoader_.written_, path);\n"
+                    "goog.object.remove(goog.debugLoader_.written_, goog.basePath + path);\n"
+                    "} else {\n"
+                    "let path = goog.object.get(goog.dependencies_.nameToPath, src);\n"
+                    "goog.object.remove(goog.dependencies_.visited, path);\n"
+                    "goog.object.remove(goog.dependencies_.written, path);\n"
+                    "goog.object.remove(goog.dependencies_.visited, goog.basePath + path);\n"
+                    "}\n"
+                    "}\n"
+                    "let ret = goog.require__(src);\n"
+                    "if(reload === \"reload-all\") {\n"
+                    "goog.cljsReloadAll_ = false\n"
+                    "}\n"
+                    "if(goog.isInModuleLoader_()) {\n"
+                    "return goog.module.getInternal_(src);\n"
+                    "} else {\n"
+                    "return ret;\n"
+                    "}\n"
+                    "};\n"
                             "};", source);
 }
 

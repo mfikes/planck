@@ -8,9 +8,6 @@ if [ ! -f compiler/closure-compiler-v$GCC_RELEASE.jar ]; then
   echo "Fetching Google Closure Compiler..."
   mkdir -p compiler
   cd compiler
-  curl --retry 3 -O -s https://dl.google.com/closure-compiler/compiler-$GCC_RELEASE.zip || { echo "Download failed."; exit 1; }
-  unzip -qu compiler-$GCC_RELEASE.zip
-  echo "Cleaning up Google Closure Compiler archive..."
-  rm compiler-$GCC_RELEASE.zip
+  curl --retry 3 -O -s https://repo1.maven.org/maven2/com/google/javascript/closure-compiler/v$GCC_RELEASE/closure-compiler-v$GCC_RELEASE.jar || { echo "Download failed."; exit 1; }
   cd ../..
 fi
