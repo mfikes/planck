@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e -o pipefail
 
 while [ $# -gt 0 ]
 do
@@ -40,7 +41,7 @@ if [ -z ${FAST_BUILD+set} ]; then
 fi
 
 #----------------------------------------------------
-# Exit if the last command failed, indicating 
+# If the last command failed, indicate
 # that there was a build failure
 #----------------------------------------------------
 checkCmdSuccess() {
@@ -50,6 +51,7 @@ checkCmdSuccess() {
         exit $CMD_RESULT 
     fi
 }
+trap checkCmdSuccess EXIT
 
 export GCC_RELEASE="20190301"
 export CLOSURE_JS_RELEASE=${GCC_RELEASE}.0.0
@@ -70,7 +72,6 @@ if [ -n "$NON_BUNDLED_SRC" ] || [ ! -d planck-c/build ] || [ $BUNDLE_SIZE -le 40
   cd planck-cljs
   echo "### Building planck-cljs"
   script/build
-  checkCmdSuccess
   cd ..
   
   # Remove any leftover macros files so that they will not be bundled
@@ -91,7 +92,6 @@ if [ -n "$NON_BUNDLED_SRC" ] || [ ! -d planck-c/build ] || [ $BUNDLE_SIZE -le 40
   echo "### Bundling ClojureScript artifacts for 1st stage"
   cd planck-cljs
   script/bundle
-  checkCmdSuccess
   cd ..
   
   echo "### Building 1st stage Planck binary"
@@ -101,16 +101,13 @@ if [ -n "$NON_BUNDLED_SRC" ] || [ ! -d planck-c/build ] || [ $BUNDLE_SIZE -le 40
   if [ ! -e Makefile ]
   then
      cmake .. > /dev/null
-     checkCmdSuccess
   fi
   make > /dev/null
-  checkCmdSuccess
   cd ../..
   
   echo "### AOT compiling macro namespaces"
   mkdir -p planck-cljs/out/macros-tmp
   planck-c/build/planck -sk planck-cljs/out/macros-tmp -e"(require 'cljs.analyzer)" -e"(do (set! cljs.analyzer/*cljs-warnings* (assoc cljs.analyzer/*cljs-warnings* :undeclared-var false)) nil)" -e "(require-macros 'planck.repl 'planck.core 'planck.shell 'planck.from.io.aviso.ansi 'clojure.template 'cljs.spec.alpha 'cljs.spec.test.alpha 'cljs.spec.gen.alpha 'cljs.test 'cljs.pprint 'cljs.analyzer.macros 'cljs.compiler.macros 'cljs.env.macros)"
-  checkCmdSuccess
 
   mv planck-cljs/out/macros-tmp/planck_SLASH_repl\$macros.js planck-cljs/out/planck/repl\$macros.js
   mv planck-cljs/out/macros-tmp/planck_SLASH_repl\$macros.cache.json planck-cljs/out/planck/repl\$macros.cache.json
@@ -157,7 +154,6 @@ if [ -n "$NON_BUNDLED_SRC" ] || [ ! -d planck-c/build ] || [ $BUNDLE_SIZE -le 40
   echo "### Bundling ClojureScript artifacts for 2nd stage"
   cd planck-cljs
   script/bundle
-  checkCmdSuccess
   cd ..
 
   echo "### Building 2nd stage Planck binary"
@@ -166,7 +162,6 @@ fi
 
 cd planck-c/build
 make > /dev/null
-checkCmdSuccess
 cd ../..
 
 cp planck-man/planck.1 planck-man/plk.1

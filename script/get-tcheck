@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
+set -e -o pipefail
 
 if [ "${VERBOSE_BUILD:-0}" == "1" ]; then
   set -x
 fi
 
 mkdir -p lib
-if [ ! -f lib/test.check-0.10.0-alpha4.jar ]; then
-  cp ~/.m2/repository/org/clojure/test.check/0.10.0-alpha4/test.check-0.10.0-alpha4.jar lib/test.check-0.10.0-alpha4.jar
+version=0.10.0-alpha4
+if [ ! -f lib/test.check-$version.jar ]; then
+  cp ~/.m2/repository/org/clojure/test.check/$version/test.check-$version.jar lib/test.check-$version.jar
 fi

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -e -o pipefail
+
 export VERBOSE_BUILD=1
 export SANDBOX_BUILD=1
 export CLJ_CONFIG=clj-config
